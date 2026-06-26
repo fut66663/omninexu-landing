@@ -1,0 +1,71 @@
+# OmniNexu — Agent Data Intelligence
+
+> Machine-readable catalog. Agents: read this first.
+> Humans: https://omninexu.com
+> Full JSON catalog: https://omninexu.com/catalog.json
+
+## Discovery Files
+
+| File | Purpose |
+|------|---------|
+| `/llms.txt` | This file — AI agent quick reference |
+| `/catalog.json` | Full structured data catalog (Schema.org Dataset) |
+| `/robots.txt` | AI crawler allowlist (GPTBot, ClaudeBot, PerplexityBot...) |
+| `/sitemap.xml` | Site structure for crawlers |
+
+## What We Provide
+
+Structured financial intelligence endpoints for AI agents.
+US equities coverage (NYSE, NASDAQ, AMEX): 5,000+ tickers.
+
+## Products
+
+### Company Intelligence v1
+- Endpoint: `GET /intelligence/:ticker`
+- Protocol: x402 (HTTP + USDC payment)
+- Pricing: To be announced
+
+Response structure:
+- `scores`: 8 aggregated dimensions (0–100)
+  - sector_momentum, financial_quality, management_signal, institutional_signal
+  - expansion_activity, policy_risk_exposure, event_activity, composite
+- `facts`: 3 objective fact layers
+  - insider_activity (SEC Form 4)
+  - institutional_activity (SEC 13F)
+  - financial_trends (SEC 10-K/Q)
+- `data_provenance`: Source filing references (CIK, accession number, form type)
+- `disclaimer`: Objective data aggregation. Not investment advice.
+
+## Data Sources
+
+1. SEC EDGAR (Primary): Form 4, 13F, 10-K/Q, 8-K. Parsed via edgartools.
+   Coverage: 1994–present. Update: real-time + daily batch.
+2. Exchange Feeds: NYSE/NASDAQ consolidated tape. Latency <300ms.
+3. Alternative (Public): USPTO, FDA, SAM.gov, NOAA. Non-commercial.
+
+## Verification
+
+Every response includes `data_provenance` with exact SEC filing references.
+Agents can independently fetch and cross-validate via sec.gov.
+Example: CIK 0000320193, Filing 0000320193-26-000041, Form 4.
+
+## Benchmarking
+
+Same SEC source data as Bloomberg/Refinitiv/FactSet.
+Field-level mapping available at https://omninexu.com/#benchmarking.
+
+## Purchase Flow
+
+1. Agent discovers this file at omninexu.com/llms.txt
+2. Agent parses endpoint schema from JSON-LD on omninexu.com
+3. Agent queries via x402: GET https://agentic.market/store/omninexu/intelligence/AAPL
+4. Payment in USDC, auto-settled via x402 protocol
+
+## Store
+
+All purchases via agentic.market: https://agentic.market/store/omninexu
+
+## Contact
+
+Email: hello@omninexu.com
+Domain: omninexu.com

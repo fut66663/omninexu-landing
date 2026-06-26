@@ -1,0 +1,44 @@
+# ── OmniNexu robots.txt ──
+# We WANT AI agents to discover us. Crawl freely.
+
+# ── AI Search & Agent Crawlers: ALLOW ──
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+# ── Traditional Search Engines ──
+User-agent: Bingbot
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+# ── Fallback: allow all ──
+User-agent: *
+Allow: /
+
+# ── Key discovery files for AI agents ──
+Sitemap: https://omninexu.com/sitemap.xml

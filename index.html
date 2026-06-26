@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OmniNexu — AI Agent Financial Data Intelligence</title>
+<meta name="description" content="Structured financial intelligence for AI agents. SEC EDGAR-sourced company data: insider trades, institutional holdings, financial trends, risk signals. 5,000+ US tickers. Benchmark-grade, machine-readable, x402-native.">
+<meta name="keywords" content="AI agent data, financial intelligence API, SEC EDGAR data, company intelligence endpoint, x402 data provider, machine-readable financial data, US equities data API, agentic market, AI agent financial data, Form 4 insider data, 13F institutional data, hedge fund data, quantitative finance data, alternative data for AI">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<meta name="author" content="OmniNexu">
+<link rel="canonical" href="https://omninexu.com/">
+
+<!-- OpenGraph / AI preview cards -->
+<meta property="og:title" content="OmniNexu — AI Agent Financial Data Intelligence">
+<meta property="og:description" content="Structured financial intelligence for AI agents. 5,000+ US tickers. SEC-verified, x402-native.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://omninexu.com/">
+<meta property="og:site_name" content="OmniNexu">
+
+<!-- AI discovery files -->
+<link rel="alternate" type="text/markdown" href="/llms.txt" title="AI Agent Quick Reference">
+<link rel="alternate" type="application/json" href="/catalog.json" title="Machine-Readable Data Catalog">
+
+<!-- JSON-LD: AI agents read this first -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "DataCatalog",
+  "name": "OmniNexu Agent Data Intelligence",
+  "description": "Structured financial intelligence endpoints for AI agents. US equities coverage with 11-dimension company intelligence, SEC EDGAR-sourced, cross-validated against major institutional data providers.",
+  "provider": { "@type": "Organization", "name": "OmniNexu", "url": "https://omninexu.com" },
+  "url": "https://omninexu.com",
+  "areaServed": ["NYSE", "NASDAQ", "AMEX"],
+  "dataset": [
+    {
+      "@type": "Dataset",
+      "name": "Company Intelligence v1",
+      "description": "11-dimension per-ticker intelligence endpoint: sector momentum, financial quality, management signal, institutional signal, expansion activity, policy risk, event activity, plus insider/institutional/financial facts.",
+      "url": "https://agentic.market/store/omninexu",
+      "variableMeasured": ["sector_momentum", "financial_quality", "management_signal", "institutional_signal", "expansion_activity", "policy_risk_exposure", "event_activity", "composite"],
+      "temporalCoverage": "Real-time + historical from SEC filings",
+      "creator": { "@type": "Organization", "name": "OmniNexu" }
+    }
+  ],
+  "offers": {
+    "@type": "Offer",
+    "priceCurrency": "USDC",
+    "description": "Available on agentic.market. Pricing to be announced."
+  }
+}
+</script>
+
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          neon: { DEFAULT: '#4ade80', dim: '#22c55e', glow: '#86efac' },
+          void: { DEFAULT: '#060b10', soft: '#0a1018', card: '#0f1923' }
+        },
+        fontFamily: {
+          mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace']
+        },
+        animation: {
+          'pulse-glow': 'pulseGlow 3s ease-in-out infinite',
+          'fade-up': 'fadeUp 0.6s ease-out forwards',
+          'slide-right': 'slideRight 0.5s ease-out forwards',
+        }
+      }
+    }
+  }
+</script>
+
+<!-- Particle network: pure Canvas, zero dependencies -->
+
+<style>
+  /* ═══════════════════════════════════════════
+     OmniNexu — Custom Styles
+     ═══════════════════════════════════════════ */
+
+  :root {
+    --green: #4ade80;
+    --green-dim: #22c55e;
+    --green-glow: rgba(74, 222, 128, 0.15);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: #060b10;
+    color: #e5e7eb;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* ── Particle Canvas ── */
+  #particles {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ── Glow Orbs ── */
+  .glow-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.12;
+    pointer-events: none;
+  }
+  .glow-orb--green {
+    width: 600px; height: 600px;
+    background: #4ade80;
+    top: -200px; right: -150px;
+  }
+  .glow-orb--teal {
+    width: 400px; height: 400px;
+    background: #2dd4bf;
+    bottom: 10%; left: -100px;
+    opacity: 0.08;
+  }
+
+  /* ── Glass Card ── */
+  .glass {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+  }
+  .glass:hover {
+    border-color: rgba(74, 222, 128, 0.25);
+    transition: border-color 0.4s;
+  }
+
+  /* ── Green Neon Glow + Flicker ── */
+  @keyframes neonPulse {
+    0%, 100% {
+      text-shadow:
+        0 0 7px #fff,
+        0 0 10px #fff,
+        0 0 21px #fff,
+        0 0 42px #4ade80,
+        0 0 82px #4ade80,
+        0 0 92px #4ade80,
+        0 0 102px #4ade80,
+        0 0 151px #4ade80;
+    }
+    50% {
+      text-shadow:
+        0 0 4px #fff,
+        0 0 7px #fff,
+        0 0 13px #fff,
+        0 0 26px #4ade80,
+        0 0 52px #4ade80,
+        0 0 62px #4ade80,
+        0 0 72px #4ade80,
+        0 0 101px #4ade80;
+    }
+  }
+
+  @keyframes flicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+    20%, 24%, 55% { opacity: 0.6; }
+  }
+
+  .text-glow {
+    color: #fff;
+    animation: neonPulse 2.5s ease-in-out infinite, flicker 4s infinite;
+    text-shadow:
+      0 0 7px #fff,
+      0 0 10px #fff,
+      0 0 21px #fff,
+      0 0 42px #4ade80,
+      0 0 82px #4ade80,
+      0 0 92px #4ade80,
+      0 0 102px #4ade80,
+      0 0 151px #4ade80;
+  }
+
+  /* ── Neon Border Pulse ── */
+  .border-glow {
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    box-shadow: 0 0 20px rgba(74, 222, 128, 0.08), inset 0 0 20px rgba(74, 222, 128, 0.03);
+  }
+  .border-glow:hover {
+    border-color: rgba(74, 222, 128, 0.6);
+    box-shadow: 0 0 35px rgba(74, 222, 128, 0.15), inset 0 0 35px rgba(74, 222, 128, 0.05);
+    transition: all 0.5s;
+  }
+
+  /* ── Code / Mono blocks ── */
+  .code-block {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  /* ── Grid lines background (subtle) ── */
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* ── Scroll-triggered animation ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── Section divider ── */
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(74,222,128,0.2), transparent);
+    border: none;
+  }
+
+  /* ── Data table ── */
+  .data-table th {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    color: #4ade80;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .data-table td {
+    font-size: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    padding: 12px 16px;
+  }
+
+  /* ── Blink cursor ── */
+  .cursor::after {
+    content: '_';
+    animation: blink 1s step-end infinite;
+    color: #4ade80;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ── Pulse ring ── */
+  @keyframes pulseRing {
+    0% { box-shadow: 0 0 0 0 rgba(74,222,128,0.4); }
+    70% { box-shadow: 0 0 0 12px rgba(74,222,128,0); }
+    100% { box-shadow: 0 0 0 0 rgba(74,222,128,0); }
+  }
+  .pulse-ring {
+    animation: pulseRing 2.5s ease-out infinite;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body class="antialiased">
+
+<!-- ═══════════════════════════════════════════
+     Particle Background
+     ═══════════════════════════════════════════ -->
+<div id="particles"></div>
+
+<!-- Glow Orbs -->
+<div class="glow-orb glow-orb--green"></div>
+<div class="glow-orb glow-orb--teal"></div>
+
+<!-- ═══════════════════════════════════════════
+     Container
+     ═══════════════════════════════════════════ -->
+<main class="relative z-10">
+
+<!-- ──────── HERO ──────── -->
+<section class="min-h-screen flex flex-col items-center justify-center px-6 text-center relative">
+  <div class="max-w-4xl mx-auto">
+
+    <!-- Badge -->
+    <div class="inline-flex items-center gap-2 glass px-4 py-2 rounded-full text-xs font-mono text-neon mb-8 pulse-ring">
+      <span class="w-2 h-2 bg-neon rounded-full"></span>
+      Agent Data Intelligence · v1
+    </div>
+
+    <!-- Logo -->
+    <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-6">
+      <span class="text-white">omni</span><span class="text-glow">nexu</span>
+    </h1>
+
+    <!-- Tagline -->
+    <p class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-4 font-light">
+      Structured financial intelligence endpoints —
+      <span class="text-white font-normal">built for AI agents</span>,
+      not humans.
+    </p>
+
+    <!-- Sub-tagline -->
+    <p class="text-sm text-gray-600 max-w-xl mx-auto mb-10 font-mono">
+      Agents read <code class="text-neon">/llms.txt</code> → Understand data schema → Query via x402 → Pay in USDC
+      <br>Zero human intervention. Full machine-to-machine pipeline.
+    </p>
+
+    <!-- CTA Buttons -->
+    <div class="flex flex-wrap gap-4 justify-center">
+      <a href="https://agentic.market/store/omninexu"
+         class="inline-flex items-center gap-2 bg-neon text-black font-semibold px-6 py-3 rounded-xl hover:bg-neon-dim transition-colors duration-300">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Access on agentic.market
+      </a>
+      <a href="#products"
+         class="inline-flex items-center gap-2 border border-white/10 text-white px-6 py-3 rounded-xl hover:border-neon/40 hover:text-neon transition-all duration-300">
+        Explore Endpoints
+        <span class="text-neon">↓</span>
+      </a>
+    </div>
+
+    <!-- Quick stats -->
+    <div class="grid grid-cols-3 gap-8 max-w-lg mx-auto mt-16 text-center">
+      <div><div class="text-2xl font-bold text-white font-mono">5,000+</div><div class="text-xs text-gray-500 mt-1">US Tickers</div></div>
+      <div><div class="text-2xl font-bold text-white font-mono">11</div><div class="text-xs text-gray-500 mt-1">Dimensions</div></div>
+      <div><div class="text-2xl font-bold text-white font-mono">&lt;300ms</div><div class="text-xs text-gray-500 mt-1">Response</div></div>
+    </div>
+
+  </div>
+
+  <!-- Scroll hint -->
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-600 text-xs font-mono flex flex-col items-center gap-2">
+    <span>agent-readable below</span>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-bounce"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+</section>
+
+<!-- ──────── PRODUCTS ──────── -->
+<section id="products" class="py-24 px-6 grid-bg">
+  <div class="max-w-6xl mx-auto">
+
+    <div class="reveal mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-3">Data Products</h2>
+      <p class="text-gray-500 font-mono text-sm">GET /intelligence/:ticker → 11-dimension structured response</p>
+    </div>
+
+    <!-- Endpoint Card -->
+    <div class="reveal glass p-8 mb-8 border-glow">
+      <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
+        <div>
+          <div class="flex items-center gap-3 mb-2">
+            <span class="inline-block px-2 py-0.5 text-[10px] font-mono font-bold text-neon border border-neon/30 rounded">GET</span>
+            <code class="text-lg text-white font-mono">/intelligence/:ticker</code>
+          </div>
+          <p class="text-gray-400 text-sm">Single-ticker company intelligence. 8 scoring dimensions + 3 fact layers.</p>
+        </div>
+        <div class="text-right">
+          <div class="text-neon text-2xl font-bold font-mono">$0.05–0.10</div>
+          <div class="text-gray-500 text-xs">USDC per call</div>
+        </div>
+      </div>
+
+      <!-- Dimensions Grid -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <div class="bg-black/30 rounded-lg p-3 border border-white/5">
+          <div class="text-neon text-xs font-mono mb-1">01</div>
+          <div class="text-white text-sm font-medium">Sector Momentum</div>
+          <div class="text-gray-600 text-xs">SIC-weighted peer comparison</div>
+        </div>
+        <div class="bg-black/30 rounded-lg p-3 border border-white/5">
+          <div class="text-neon text-xs font-mono mb-1">02</div>
+          <div class="text-white text-sm font-medium">Financial Quality</div>
+          <div class="text-gray-600 text-xs">Multi-period trend scoring</div>
+        </div>
+        <div class="bg-black/30 rounded-lg p-3 border border-white/5">
+          <div class="text-neon text-xs font-mono mb-1">03</div>
+          <div class="text-white text-sm font-medium">Management Signal</div>
+          <div class="text-gray-600 text-xs">Form 4 insider cluster detection</div>
+        </div>
+        <div class="bg-black/30 rounded-lg p-3 border border-white/5">
+          <div class="text-neon text-xs font-mono mb-1">04</div>
+          <div class="text-white text-sm font-medium">Institutional Signal</div>
+          <div class="text-gray-600 text-xs">13F QoQ net flow analysis</div>
+        </div>
+        <div class="bg-black/30 rounded-lg p-3 border border-white/5">
+          <div class="text-neon text-xs font-mono mb-1">05</div>
+          <div class="text-white text-sm font-medium">Expansion Activity</div>
+          <div class="text-gray-600 text-xs">M&A, new markets, hiring</div>
+        </div>
+        <div class="bg-black/30 rounded-lg p-3 border border-white/5">
+          <div class="text-neon text-xs font-mono mb-1">06</div>
+          <div class="text-white text-sm font-medium">Policy Risk</div>
+          <div class="text-gray-600 text-xs">Regulatory & geopolitical exposure</div>
+        </div>
+        <div class="bg-black/30 rounded-lg p-3 border border-white/5">
+          <div class="text-neon text-xs font-mono mb-1">07</div>
+          <div class="text-white text-sm font-medium">Event Activity</div>
+          <div class="text-gray-600 text-xs">Earnings, FDA, litigation signals</div>
+        </div>
+        <div class="bg-black/30 rounded-lg p-3 border border-white/5">
+          <div class="text-neon text-xs font-mono mb-1">08</div>
+          <div class="text-white text-sm font-medium">Composite Score</div>
+          <div class="text-gray-600 text-xs">Weighted aggregation 0–100</div>
+        </div>
+      </div>
+
+      <!-- Fact layers -->
+      <div class="flex flex-wrap gap-4 text-xs font-mono text-gray-500">
+        <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-neon/50 rounded-full"></span> Insider Activity (Form 4)</span>
+        <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-neon/50 rounded-full"></span> Institutional Activity (13F)</span>
+        <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-neon/50 rounded-full"></span> Financial Trends (10-K/Q)</span>
+      </div>
+    </div>
+
+    <!-- Sample Response Preview -->
+    <div class="reveal">
+      <div class="flex items-center gap-2 mb-3 text-xs font-mono text-gray-600">
+        <span>Sample response excerpt</span>
+        <span class="text-neon cursor">agent.parse()</span>
+      </div>
+      <div class="code-block p-6 overflow-x-auto text-xs md:text-sm">
+        <pre class="text-gray-300">{
+  <span class="text-neon">"ticker"</span>: <span class="text-white">"AAPL"</span>,
+  <span class="text-neon">"scores"</span>: {
+    <span class="text-gray-500">"sector_momentum"</span>: 78,
+    <span class="text-gray-500">"financial_quality"</span>: 72,
+    <span class="text-gray-500">"management_signal"</span>: 82,
+    <span class="text-gray-500">"institutional_signal"</span>: 65,
+    <span class="text-gray-500">"expansion_activity"</span>: 70,
+    <span class="text-gray-500">"policy_risk_exposure"</span>: 40,
+    <span class="text-gray-500">"event_activity"</span>: 25,
+    <span class="text-neon font-bold">"composite"</span>: 68
+  },
+  <span class="text-neon">"facts"</span>: {
+    <span class="text-gray-500">"insider_activity"</span>: {
+      <span class="text-gray-500">"discretionary_buys"</span>: <span class="text-white">3</span>,
+      <span class="text-gray-500">"cluster_detected"</span>: <span class="text-amber-400">true</span>
+    },
+    <span class="text-gray-500">"institutional_activity"</span>: {
+      <span class="text-gray-500">"net_flow"</span>: <span class="text-neon">"accumulation"</span>
+    }
+  },
+  <span class="text-neon">"disclaimer"</span>: <span class="text-gray-600">"客观数据聚合。非投资建议。"</span>
+}</pre>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ──────── SOURCES & TRUST ──────── -->
+<section class="py-24 px-6">
+  <div class="max-w-6xl mx-auto">
+
+    <div class="reveal mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-3">Data Sources &amp; Provenance</h2>
+      <p class="text-gray-500 font-mono text-sm">Every data point traceable to its origin. Agents verify, don't trust.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Source 1 -->
+      <div class="reveal glass p-6">
+        <div class="text-neon text-2xl mb-4">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="16" rx="2"/><line x1="6" y1="7" x2="10" y2="7"/><line x1="6" y1="11" x2="14" y2="11"/><line x1="6" y1="15" x2="18" y2="15"/></svg>
+        </div>
+        <h3 class="text-white font-semibold mb-2">SEC EDGAR (Primary)</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">
+          Direct from <code class="text-neon/80 text-xs font-mono">sec.gov</code>. Form 4 (insider), 13F (institutional), 10-K/Q (financials), 8-K (material events). Parsed via open-source <code class="text-neon/80 text-xs font-mono">edgartools</code>.
+        </p>
+        <ul class="mt-4 space-y-2 text-xs font-mono text-gray-600">
+          <li class="flex items-center gap-2"><span class="w-1 h-1 bg-neon/40 rounded-full"></span> Update: real-time 8-K + daily batch</li>
+          <li class="flex items-center gap-2"><span class="w-1 h-1 bg-neon/40 rounded-full"></span> Coverage: 1994–present</li>
+        </ul>
+      </div>
+
+      <!-- Source 2 -->
+      <div class="reveal glass p-6">
+        <div class="text-neon text-2xl mb-4">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <h3 class="text-white font-semibold mb-2">Exchange Feeds</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">
+          NYSE/NASDAQ consolidated tape via licensed data vendors. Price, volume, and order-flow data for market context.
+        </p>
+        <ul class="mt-4 space-y-2 text-xs font-mono text-gray-600">
+          <li class="flex items-center gap-2"><span class="w-1 h-1 bg-neon/40 rounded-full"></span> Latency: &lt;300ms normalized</li>
+          <li class="flex items-center gap-2"><span class="w-1 h-1 bg-neon/40 rounded-full"></span> Coverage: all listed US equities</li>
+        </ul>
+      </div>
+
+      <!-- Source 3 -->
+      <div class="reveal glass p-6">
+        <div class="text-neon text-2xl mb-4">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>
+        </div>
+        <h3 class="text-white font-semibold mb-2">Alternative Data</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">
+          Publicly-sourced alternative signals: patent filings, FDA calendars, government contract awards, satellite-derived economic indicators.
+        </p>
+        <ul class="mt-4 space-y-2 text-xs font-mono text-gray-600">
+          <li class="flex items-center gap-2"><span class="w-1 h-1 bg-neon/40 rounded-full"></span> USPTO, FDA, SAM.gov, NOAA</li>
+          <li class="flex items-center gap-2"><span class="w-1 h-1 bg-neon/40 rounded-full"></span> Non-commercial, public domain</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Verification -->
+    <div class="reveal glass p-6 mt-6 border-l-2 border-neon/30">
+      <h3 class="text-white font-semibold mb-3 flex items-center gap-2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        Agent-Verifiable Provenance
+      </h3>
+      <p class="text-gray-400 text-sm leading-relaxed">
+        Each endpoint response includes a <code class="text-neon/80 text-xs font-mono">data_provenance</code> block listing exact source document (e.g., <code class="text-gray-500 text-xs">CIK 0000320193, Filing 0000320193-26-000041, Form 4</code>). AI agents can independently fetch and cross-validate the source filing via SEC EDGAR. No black boxes.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ──────── BENCHMARKING ──────── -->
+<section class="py-24 px-6">
+  <div class="max-w-6xl mx-auto">
+
+    <div class="reveal mb-12">
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-3">Institutional Benchmarking</h2>
+      <p class="text-gray-500 font-mono text-sm">How OmniNexu maps to major data providers. Transparent field-level comparison.</p>
+    </div>
+
+    <div class="reveal overflow-x-auto">
+      <table class="data-table w-full">
+        <thead>
+          <tr class="border-b border-white/5">
+            <th class="text-left py-3 px-4">Dimension</th>
+            <th class="text-left py-3 px-4 text-neon">omninexu</th>
+            <th class="text-left py-3 px-4">Bloomberg</th>
+            <th class="text-left py-3 px-4">Refinitiv</th>
+            <th class="text-left py-3 px-4">FactSet</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="font-medium text-white">Insider Transactions</td>
+            <td class="text-neon font-mono text-xs">Form 4 → signal score</td>
+            <td class="text-gray-400 text-xs">INSR <span class="text-gray-600">(same source)</span></td>
+            <td class="text-gray-400 text-xs">Insider Filings</td>
+            <td class="text-gray-400 text-xs">Insider Transactions</td>
+          </tr>
+          <tr>
+            <td class="font-medium text-white">Institutional Ownership</td>
+            <td class="text-neon font-mono text-xs">13F → net flow</td>
+            <td class="text-gray-400 text-xs">HDS <span class="text-gray-600">(same source)</span></td>
+            <td class="text-gray-400 text-xs">Institutional Holdings</td>
+            <td class="text-gray-400 text-xs">Ownership 2.0</td>
+          </tr>
+          <tr>
+            <td class="font-medium text-white">Financial Quality</td>
+            <td class="text-neon font-mono text-xs">10-K/Q → trend score</td>
+            <td class="text-gray-400 text-xs">FA <span class="text-gray-600">(same source)</span></td>
+            <td class="text-gray-400 text-xs">Fundamentals</td>
+            <td class="text-gray-400 text-xs">Fundamentals</td>
+          </tr>
+          <tr>
+            <td class="font-medium text-white">Sector Momentum</td>
+            <td class="text-neon font-mono text-xs">SIC-weighted peer set</td>
+            <td class="text-gray-400 text-xs">Relative Strength</td>
+            <td class="text-gray-400 text-xs">Sector Indices</td>
+            <td class="text-gray-400 text-xs">RBICS Momentum</td>
+          </tr>
+          <tr>
+            <td class="font-medium text-white">Policy Risk</td>
+            <td class="text-neon font-mono text-xs">Regulatory filings + news NLP</td>
+            <td class="text-gray-400 text-xs">GOV, REG</td>
+            <td class="text-gray-400 text-xs">ESG → Governance</td>
+            <td class="text-gray-400 text-xs">Truvalue</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="reveal mt-6 glass p-5 text-sm text-gray-500 font-mono leading-relaxed">
+      <span class="text-neon">Key difference:</span> Bloomberg/Refinitiv/FactSet charge <strong class="text-white">$2,000–24,000/year per seat</strong>.
+      OmniNexu: <strong class="text-white">$0.05/call, 100 free/day</strong>.
+      Same SEC source data. Different delivery model — built for agents, not terminals.
+      <br><span class="text-gray-600">Not a replacement. An alternative access layer for automated workflows.</span>
+    </div>
+
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ──────── HOW TO ACCESS ──────── -->
+<section class="py-24 px-6">
+  <div class="max-w-4xl mx-auto text-center">
+
+    <div class="reveal mb-10">
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-3">Agent → Market Pipeline</h2>
+      <p class="text-gray-500 font-mono text-sm">One URL. Machine-readable. Zero-touch purchase.</p>
+    </div>
+
+    <!-- Flow -->
+    <div class="reveal grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
+      <div class="glass p-5 text-center">
+        <div class="text-neon text-2xl font-bold font-mono mb-2">①</div>
+        <div class="text-white text-sm font-medium">Discover</div>
+        <div class="text-gray-500 text-xs mt-1 font-mono">llms.txt → catalog</div>
+      </div>
+      <div class="glass p-5 text-center">
+        <div class="text-neon text-2xl font-bold font-mono mb-2">②</div>
+        <div class="text-white text-sm font-medium">Understand</div>
+        <div class="text-gray-500 text-xs mt-1 font-mono">JSON Schema parsing</div>
+      </div>
+      <div class="glass p-5 text-center">
+        <div class="text-neon text-2xl font-bold font-mono mb-2">③</div>
+        <div class="text-white text-sm font-medium">Query</div>
+        <div class="text-gray-500 text-xs mt-1 font-mono">x402 GET /intel/AAPL</div>
+      </div>
+      <div class="glass p-5 text-center">
+        <div class="text-neon text-2xl font-bold font-mono mb-2">④</div>
+        <div class="text-white text-sm font-medium">Pay</div>
+        <div class="text-gray-500 text-xs mt-1 font-mono">USDC settlement</div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="reveal">
+      <a href="https://agentic.market/store/omninexu"
+         class="inline-flex items-center gap-3 bg-neon text-black font-bold px-10 py-4 rounded-xl hover:bg-neon-dim transition-all duration-300 text-lg shadow-lg shadow-neon/20">
+        Access Store on agentic.market
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+      <p class="mt-6 text-gray-600 text-xs font-mono">
+        Agents: first request <a href="/llms.txt" class="text-neon/60 hover:text-neon underline">omninexu.com/llms.txt</a> for machine-readable catalog
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ──────── FOOTER ──────── -->
+<footer class="py-12 px-6">
+  <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-4">
+    <div class="flex items-center gap-2">
+      <span class="text-white font-bold text-lg">omni<span class="text-neon">nexu</span></span>
+      <span class="text-gray-700 text-xs font-mono">· Agent Data Intelligence · v1</span>
+    </div>
+    <div class="flex flex-wrap gap-6 text-xs font-mono text-gray-600">
+      <a href="/llms.txt" class="hover:text-neon transition-colors">llms.txt</a>
+      <a href="mailto:hello@omninexu.com" class="hover:text-neon transition-colors">hello@omninexu.com</a>
+      <a href="https://agentic.market/store/omninexu" class="hover:text-neon transition-colors">agentic.market</a>
+    </div>
+  </div>
+  <div class="max-w-6xl mx-auto mt-8 text-xs text-gray-700 font-mono">
+    Disclaimer: OmniNexu provides objective data aggregation based on publicly available SEC filings. Scores are statistical outputs — not investment advice, recommendations, or predictions. Users bear full responsibility for all investment decisions.
+  </div>
+</footer>
+
+</main>
+
+<!-- ═══════════════════════════════════════════
+     Scripts
+     ═══════════════════════════════════════════ -->
+
+<!-- Particle Network: high-density, bright neon glow, Canvas only -->
+<script>
+  (() => {
+    const canvas = document.createElement('canvas');
+    const container = document.getElementById('particles');
+    container.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+
+    let w, h, mouse = { x: -9999, y: -9999 };
+    const PARTICLE_COUNT = 120;
+    const MAX_LINK_DIST = 170;
+    const particles = [];
+
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    document.addEventListener('mousemove', e => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    // Create particles with varied sizes for depth
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+        r: Math.random() * 2.2 + 0.8,
+      });
+    }
+
+    function draw() {
+      // Semi-transparent clear for subtle trail effect
+      ctx.fillStyle = 'rgba(6, 11, 16, 0.15)';
+      ctx.fillRect(0, 0, w, h);
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > w) p.vx *= -1;
+        if (p.y < 0 || p.y > h) p.vy *= -1;
+
+        // Mouse repulsion — wide radius, responsive
+        const dx = p.x - mouse.x;
+        const dy = p.y - mouse.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 300) {
+          const force = (300 - dist) / 300 * 0.6;
+          p.vx += (dx / dist) * force;
+          p.vy += (dy / dist) * force;
+        }
+        // Dampen speed
+        const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+        if (speed > 1.8) { p.vx *= 0.94; p.vy *= 0.94; }
+        if (speed < 0.25) { p.vx *= 1.02; p.vy *= 1.02; }
+
+        // Draw particle with neon glow
+        ctx.save();
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = 'rgba(74, 222, 128, 0.7)';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(134, 239, 172, 0.8)';
+        ctx.fill();
+        ctx.restore();
+
+        // Draw brighter core
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 0.4, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.fill();
+
+        // Draw links
+        for (let j = i + 1; j < particles.length; j++) {
+          const q = particles[j];
+          const ldx = p.x - q.x;
+          const ldy = p.y - q.y;
+          const ldist = Math.sqrt(ldx * ldx + ldy * ldy);
+          if (ldist < MAX_LINK_DIST) {
+            const alpha = 0.12 * (1 - ldist / MAX_LINK_DIST);
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(q.x, q.y);
+            ctx.strokeStyle = `rgba(74, 222, 128, ${alpha})`;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+</script>
+
+<!-- Scroll Reveal -->
+<script>
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    },
+    { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+  );
+
+  document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+</script>
+
+</body>
+</html>

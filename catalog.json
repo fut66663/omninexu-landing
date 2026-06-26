@@ -1,0 +1,80 @@
+{
+  "@context": "https://schema.org",
+  "@type": "DataCatalog",
+  "name": "OmniNexu Agent Data Intelligence",
+  "description": "Structured financial intelligence endpoints for AI agents. SEC-verified, cross-auditable, benchmarked against Bloomberg, Refinitiv, FactSet.",
+  "url": "https://omninexu.com",
+  "provider": {
+    "@type": "Organization",
+    "name": "OmniNexu",
+    "url": "https://omninexu.com",
+    "email": "hello@omninexu.com"
+  },
+  "keywords": [
+    "AI agent data",
+    "financial intelligence API",
+    "SEC EDGAR structured data",
+    "company intelligence endpoint",
+    "x402 data provider",
+    "machine-readable financial data",
+    "US equities data API",
+    "agentic market data store",
+    "institutional financial data",
+    "AI agent financial data",
+    "Form 4 insider trading data",
+    "13F institutional holdings data",
+    "10-K 10-Q financial trends",
+    "alternative data for AI",
+    "hedge fund data API",
+    "quantitative finance data"
+  ],
+  "dataset": [
+    {
+      "@type": "Dataset",
+      "identifier": "company-intelligence-v1",
+      "name": "Company Intelligence v1",
+      "description": "Per-ticker 11-dimension intelligence endpoint. 8 composite scores + 3 objective fact layers sourced from SEC filings.",
+      "url": "https://agentic.market/store/omninexu",
+      "endpoint": "GET /intelligence/:ticker",
+      "protocol": "x402",
+      "coverage": {
+        "exchanges": ["NYSE", "NASDAQ", "AMEX"],
+        "tickers": "5,000+",
+        "period": "1994–present"
+      },
+      "dimensions": {
+        "scores": [
+          { "key": "sector_momentum", "description": "SIC-weighted peer comparison scoring", "range": "0–100" },
+          { "key": "financial_quality", "description": "Multi-period trend scoring from 10-K/Q filings", "range": "0–100" },
+          { "key": "management_signal", "description": "Form 4 insider transaction cluster detection", "range": "0–100" },
+          { "key": "institutional_signal", "description": "13F QoQ net flow analysis", "range": "0–100" },
+          { "key": "expansion_activity", "description": "M&A, new markets, hiring signals", "range": "0–100" },
+          { "key": "policy_risk_exposure", "description": "Regulatory and geopolitical risk assessment", "range": "0–100" },
+          { "key": "event_activity", "description": "Earnings, FDA, litigation event signals", "range": "0–100" },
+          { "key": "composite", "description": "Weighted aggregation of all dimensions", "range": "0–100" }
+        ],
+        "facts": [
+          { "key": "insider_activity", "description": "SEC Form 4 transactions: discretionary vs planned, cluster detection", "source": "sec.gov/edgar" },
+          { "key": "institutional_activity", "description": "SEC 13F filings: top additions/reductions, net flow direction", "source": "sec.gov/edgar" },
+          { "key": "financial_trends", "description": "Multi-quarter revenue, earnings, margin trends", "source": "sec.gov/edgar" }
+        ]
+      },
+      "provenance": {
+        "source": "SEC EDGAR (primary), exchange feeds, public alternative data",
+        "verification": "Every response includes data_provenance block with exact CIK, accession number, form type",
+        "cross_validation": "Agents can independently fetch source filings from sec.gov"
+      },
+      "benchmarking": {
+        "bloomberg": "INSR, HDS, FA — same SEC source data",
+        "refinitiv": "Insider Filings, Institutional Holdings, Fundamentals",
+        "factset": "Insider Transactions, Ownership 2.0, Fundamentals"
+      },
+      "pricing": {
+        "status": "to_be_announced",
+        "currency": "USDC",
+        "purchase_url": "https://agentic.market/store/omninexu"
+      },
+      "disclaimer": "OmniNexu provides objective data aggregation based on publicly available SEC filings. Scores are statistical outputs — not investment advice, recommendations, or predictions."
+    }
+  ]
+}
