@@ -260,7 +260,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       || 'unknown'
     const path = detectPath(req)
     const referer = (req.headers['referer'] as string) || ''
-    const country = (req.headers['cf-ipcountry'] as string) || 'XX'
+    const country = (req.headers['x-vercel-ip-country'] as string) || (req.headers['cf-ipcountry'] as string) || 'XX'
     const ts = Date.now()
 
     const agent = identifyAgent(ua)
