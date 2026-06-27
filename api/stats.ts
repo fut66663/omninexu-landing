@@ -27,18 +27,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     let total = 0
     let todayCount = 0
+    let uniqueSessions = 0
     const agentCounts: Record<string, number> = {}
     const pathCounts: Record<string, number> = {}
+    const countryCounts: Record<string, number> = {}
     let recentVisits: Array<Record<string, unknown>> = []
     let redisOk = false
 
     try {
+      const commonCountries = ['US', 'CN', 'JP', 'GB', 'DE', 'SG', 'HK', 'KR', 'IN', 'CA']
       const keys = [
         'count:total',
         `count:today:${today}`,
         ...Object.keys(AGENT_LABELS).map((a) => `count:agent:${a}`),
         'count:path:/llms.txt',
         'count:path:/catalog.json',
+        'count:path:/ (homepage)',
+        ...commonCountries.map((c) => `count:country:${c}`),
+        'count:country:XX',
       ]
 
       const vals = await Promise.all(keys.map((k) => getRedis().get<number>(k)))
@@ -49,8 +55,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       Object.keys(AGENT_LABELS).forEach((a, i) => {
         agentCounts[a] = vals[2 + i] || 0
       })
-      pathCounts['/llms.txt'] = vals[2 + Object.keys(AGENT_LABELS).length] || 0
-      pathCounts['/catalog.json'] = vals[2 + Object.keys(AGENT_LABELS).length + 1] || 0
+      const idxBase = 2 + Object.keys(AGENT_LABELS).length
+      pathCounts['/llms.txt'] = vals[idxBase] || 0
+      pathCounts['/catalog.json'] = vals[idxBase + 1] || 0
+      pathCounts['/ (homepage)'] = vals[idxBase + 2] || 0
+
+      // Country counts
+      commonCountries.forEach((c, i) => { countryCounts[c] = vals[idxBase + 3 + i] || 0 })
+      countryCounts['Other'] = vals[idxBase + 3 + commonCountries.length] || 0
+
+      // Unique sessions today
+      const sessionCount = await getRedis().scard(`sessions:${today}`)
+      uniqueSessions = sessionCount || 0
 
       // Recent visits
       const visitKeys = await getRedis().keys('visit:*')
@@ -73,7 +89,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const llmsCount = pathCounts['/llms.txt'] || 0
     const catalogCount = pathCounts['/catalog.json'] || 0
-    const pathTotal = llmsCount + catalogCount || 1
+    const homeCount = pathCounts['/ (homepage)'] || 0
+    const pathTotal = llmsCount + catalogCount + homeCount || 1
 
     const html = `<!DOCTYPE html>
 <html lang="en">
@@ -123,6 +140,7 @@ ${redisOk ? '<div class="kv-ok">📡 Redis 已连接 — 数据实时更新</div
 <div class="kpis">
   <div class="kpi"><div class="num">${total.toLocaleString()}</div><div class="lbl">总访问量</div></div>
   <div class="kpi"><div class="num">${todayCount.toLocaleString()}</div><div class="lbl">今日</div></div>
+  <div class="kpi"><div class="num">${uniqueSessions.toLocaleString()}</div><div class="lbl">独立会话</div></div>
   <div class="kpi"><div class="num">${Object.values(agentCounts).filter(Boolean).length}</div><div class="lbl">Agent 类型</div></div>
 </div>
 
@@ -148,6 +166,27 @@ ${agentRows.map(r => `
   <span class="num">${catalogCount}</span>
   <span class="pct">${pathTotal > 0 ? ((catalogCount / pathTotal) * 100).toFixed(1) : '0.0'}%</span>
 </div>
+<div class="row">
+  <span class="name">/ (homepage)</span>
+  <span class="bar-wrap"><span class="bar-fill" style="width:${Math.max(((pathCounts['/ (homepage)'] || 0) / pathTotal) * 100, 2)}%;background:#10b981"></span></span>
+  <span class="num">${pathCounts['/ (homepage)'] || 0}</span>
+  <span class="pct">${pathTotal > 0 ? (((pathCounts['/ (homepage)'] || 0) / pathTotal) * 100).toFixed(1) : '0.0'}%</span>
+</div>
+
+<h2>国家/地区分布</h2>
+${(() => {
+  const countryLabels: Record<string, string> = { US:'🇺🇸 美国', CN:'🇨🇳 中国', JP:'🇯🇵 日本', GB:'🇬🇧 英国', DE:'🇩🇪 德国', SG:'🇸🇬 新加坡', HK:'🇭🇰 香港', KR:'🇰🇷 韩国', IN:'🇮🇳 印度', CA:'🇨🇦 加拿大', Other:'🌍 其他', XX:'🌍 未知' }
+  const entries = Object.entries(countryCounts).filter(([,c]) => c > 0)
+  if (entries.length === 0) entries.push(['—', 0])
+  const countryMax = Math.max(...entries.map(([,c]) => c), 1)
+  return entries.map(([code, count]) => `
+<div class="row">
+  <span class="name">${countryLabels[code] || code}</span>
+  <span class="bar-wrap"><span class="bar-fill" style="width:${Math.max((count / countryMax) * 100, 2)}%;background:#f59e0b"></span></span>
+  <span class="num">${count}</span>
+  <span class="pct">${todayCount > 0 ? ((count / todayCount) * 100).toFixed(0) : '0'}%</span>
+</div>`).join('')
+})()}
 
 <h2>最近访问</h2>
 <div class="recent">
@@ -158,7 +197,7 @@ ${recentVisits.length === 0
   <span class="r-time">${(v.iso as string)?.replace('T', ' ').slice(0, 19) || ''}</span>
   <span class="r-agent"><span class="tag" style="background:${COLORS[Object.keys(AGENT_LABELS).indexOf(v.agent as string)] || '#64748b'}22;color:${COLORS[Object.keys(AGENT_LABELS).indexOf(v.agent as string)] || '#64748b'}">${v.agent}</span></span>
   <span class="r-path">${v.path}</span>
-  <span class="r-ip">${v.ip}</span>
+  <span class="r-ip">${v.country || 'XX'} ${v.ip}</span>
 </div>`).join('')}
 </div>
 

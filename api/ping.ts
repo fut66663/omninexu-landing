@@ -1,7 +1,16 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { Redis } from '@upstash/redis'
+import { createHash } from 'crypto'
 
-const redis = Redis.fromEnv()
+let _redis: Redis | null = null
+function getRedis(): Redis {
+  if (!_redis) _redis = Redis.fromEnv()
+  return _redis
+}
+
+function sessionFingerprint(ip: string, ua: string): string {
+  return createHash('sha256').update(`${ip}|${ua}`).digest('hex').slice(0, 8)
+}
 
 function identifyAgent(ua: string | undefined): string {
   if (!ua || ua.trim() === '') return 'empty'
@@ -17,23 +26,28 @@ function identifyAgent(ua: string | undefined): string {
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
-    const ua = req.headers['user-agent'] as string | undefined
+    const ua = req.headers['user-agent'] as string || ''
     const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim()
       || req.socket.remoteAddress
       || 'unknown'
     const src = (req.query.src as string) || 'home'
     const referer = (req.headers['referer'] as string) || ''
+    const country = (req.headers['cf-ipcountry'] as string) || 'XX'
     const ts = Date.now()
 
     const agent = identifyAgent(ua)
+    const maskedIp = ip.replace(/[0-9]+\.[0-9]+\.[0-9]+\.([0-9]+)$/, 'x.x.x.$1')
 
     const visit = {
       agent,
-      ip: ip.replace(/[0-9]+\.[0-9]+\.[0-9]+\.([0-9]+)$/, 'x.x.x.$1'),
+      ip: maskedIp,
       path: `/ (${src})`,
       referer: referer || undefined,
       ts,
       iso: new Date(ts).toISOString(),
+      country,
+      session: sessionFingerprint(maskedIp, ua.slice(0, 200)),
+      rawUa: ua.slice(0, 500),
     }
 
     console.log(`[ping] ${JSON.stringify(visit)}`)
@@ -46,6 +60,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         getRedis().incr(`count:today:${today}`),
         getRedis().incr(`count:agent:${agent}`),
         getRedis().incr('count:path:/ (homepage)'),
+        getRedis().incr(`count:country:${country}`),
+        getRedis().sadd(`sessions:${today}`, visit.session),
       ])
     } catch (_err) {
       // Redis not available

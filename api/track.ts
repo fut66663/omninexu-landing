@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { Redis } from '@upstash/redis'
+import { createHash } from 'crypto'
 
 // ============================================================
 // Lazy Redis client — initialized on first use
@@ -9,6 +10,15 @@ let _redis: Redis | null = null
 function getRedis(): Redis {
   if (!_redis) _redis = Redis.fromEnv()
   return _redis
+}
+
+// ============================================================
+// Anonymized session hash — IP+UA → 8-char fingerprint
+// Same agent = same hash. Cannot be reversed to identify.
+// ============================================================
+
+function sessionFingerprint(ip: string, ua: string): string {
+  return createHash('sha256').update(`${ip}|${ua}`).digest('hex').slice(0, 8)
 }
 
 // ============================================================
@@ -211,6 +221,9 @@ interface VisitLog {
   referer?: string
   ts: number
   iso: string
+  country: string
+  session: string
+  rawUa: string
 }
 
 async function logVisit(v: VisitLog): Promise<void> {
@@ -226,6 +239,9 @@ async function logVisit(v: VisitLog): Promise<void> {
       getRedis().incr(`count:today:${today}`),
       getRedis().incr(`count:agent:${v.agent}`),
       getRedis().incr(`count:path:${v.path}`),
+      getRedis().incr(`count:country:${v.country}`),
+      // Track unique sessions per day
+      getRedis().sadd(`sessions:${today}`, v.session),
     ])
   } catch (err) {
     console.warn('[track] Redis write skipped (may not be configured yet)')
@@ -238,23 +254,29 @@ async function logVisit(v: VisitLog): Promise<void> {
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
-    const ua = req.headers['user-agent'] as string | undefined
+    const ua = req.headers['user-agent'] as string || ''
     const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim()
       || req.socket.remoteAddress
       || 'unknown'
     const path = detectPath(req)
     const referer = (req.headers['referer'] as string) || ''
+    const country = (req.headers['cf-ipcountry'] as string) || 'XX'
     const ts = Date.now()
 
     const agent = identifyAgent(ua)
+    const maskedIp = ip.replace(/[0-9]+\.[0-9]+\.[0-9]+\.([0-9]+)$/, 'x.x.x.$1')
+    const session = sessionFingerprint(maskedIp, ua.slice(0, 200))
 
     await logVisit({
       agent,
-      ip: ip.replace(/[0-9]+\.[0-9]+\.[0-9]+\.([0-9]+)$/, 'x.x.x.$1'),
+      ip: maskedIp,
       path,
       referer: referer || undefined,
       ts,
       iso: new Date(ts).toISOString(),
+      country,
+      session,
+      rawUa: ua.slice(0, 500), // keep first 500 chars of original UA
     })
 
     if (path === '/catalog.json') {
