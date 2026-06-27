@@ -6,6 +6,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node'
 
 export default async function handler(_req: VercelRequest, res: VercelResponse) {
   const info: Record<string, unknown> = {
+    version: '2.0-upstash',
     time: new Date().toISOString(),
     env: {},
     redis: { status: 'unknown', error: null as string | null },

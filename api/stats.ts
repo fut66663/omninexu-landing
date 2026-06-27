@@ -1,7 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { Redis } from '@upstash/redis'
 
-const redis = Redis.fromEnv()
+let _redis: Redis | null = null
+function getRedis(): Redis {
+  if (!_redis) _redis = Redis.fromEnv()
+  return _redis
+}
 
 const AGENT_LABELS: Record<string, string> = {
   openai: 'OpenAI (GPTBot/ChatGPT)',
@@ -37,7 +41,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         'count:path:/catalog.json',
       ]
 
-      const vals = await Promise.all(keys.map((k) => redis.get<number>(k)))
+      const vals = await Promise.all(keys.map((k) => getRedis().get<number>(k)))
       total = vals[0] || 0
       todayCount = vals[1] || 0
       redisOk = true
@@ -49,10 +53,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       pathCounts['/catalog.json'] = vals[2 + Object.keys(AGENT_LABELS).length + 1] || 0
 
       // Recent visits
-      const visitKeys = await redis.keys('visit:*')
+      const visitKeys = await getRedis().keys('visit:*')
       if (visitKeys.length > 0) {
         const sorted = visitKeys.sort().reverse().slice(0, 20)
-        const rows = await Promise.all(sorted.map((k) => redis.get<Record<string, unknown>>(k)))
+        const rows = await Promise.all(sorted.map((k) => getRedis().get<Record<string, unknown>>(k)))
         recentVisits = rows.filter(Boolean) as Array<Record<string, unknown>>
       }
     } catch (_err) {

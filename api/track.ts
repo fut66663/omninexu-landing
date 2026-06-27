@@ -2,10 +2,14 @@ import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { Redis } from '@upstash/redis'
 
 // ============================================================
-// Shared Redis client — auto-configures from env vars
+// Lazy Redis client — initialized on first use
 // ============================================================
 
-const redis = Redis.fromEnv()
+let _redis: Redis | null = null
+function getRedis(): Redis {
+  if (!_redis) _redis = Redis.fromEnv()
+  return _redis
+}
 
 // ============================================================
 // Static file contents — inlined for reliable serving
@@ -217,11 +221,11 @@ async function logVisit(v: VisitLog): Promise<void> {
     const visitKey = `visit:${v.path.replace(/\//g, '')}:${v.ts}`
 
     await Promise.all([
-      redis.set(visitKey, v, { ex: 2592000 }),
-      redis.incr('count:total'),
-      redis.incr(`count:today:${today}`),
-      redis.incr(`count:agent:${v.agent}`),
-      redis.incr(`count:path:${v.path}`),
+      getRedis().set(visitKey, v, { ex: 2592000 }),
+      getRedis().incr('count:total'),
+      getRedis().incr(`count:today:${today}`),
+      getRedis().incr(`count:agent:${v.agent}`),
+      getRedis().incr(`count:path:${v.path}`),
     ])
   } catch (err) {
     console.warn('[track] Redis write skipped (may not be configured yet)')

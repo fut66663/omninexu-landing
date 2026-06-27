@@ -41,11 +41,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
       const today = visit.iso.slice(0, 10)
       await Promise.all([
-        redis.set(`visit:home:${ts}`, visit, { ex: 2592000 }),
-        redis.incr('count:total'),
-        redis.incr(`count:today:${today}`),
-        redis.incr(`count:agent:${agent}`),
-        redis.incr('count:path:/ (homepage)'),
+        getRedis().set(`visit:home:${ts}`, visit, { ex: 2592000 }),
+        getRedis().incr('count:total'),
+        getRedis().incr(`count:today:${today}`),
+        getRedis().incr(`count:agent:${agent}`),
+        getRedis().incr('count:path:/ (homepage)'),
       ])
     } catch (_err) {
       // Redis not available
