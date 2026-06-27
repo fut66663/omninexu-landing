@@ -1,0 +1,12 @@
+{
+  "name": "omninexu-landing",
+  "private": true,
+  "description": "OmniNexu Agent Data Intelligence — Landing Page + AI Agent Tracking",
+  "scripts": {},
+  "dependencies": {
+    "@vercel/kv": "^1.0.0"
+  },
+  "devDependencies": {
+    "@vercel/node": "^3.0.0"
+  }
+}

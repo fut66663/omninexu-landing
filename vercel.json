@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/llms.txt", "destination": "/api/track" },
+    { "source": "/catalog.json", "destination": "/api/track" }
+  ]
+}
