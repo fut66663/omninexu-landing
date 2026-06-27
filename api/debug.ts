@@ -1,35 +1,43 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 
 // ============================================================
-// Debug endpoint — test KV connection and show env status
+// Debug endpoint — test Redis connection and show env status
 // ============================================================
 
 export default async function handler(_req: VercelRequest, res: VercelResponse) {
   const info: Record<string, unknown> = {
     time: new Date().toISOString(),
     env: {},
-    kv: { status: 'unknown', error: null as string | null },
+    redis: { status: 'unknown', error: null as string | null },
   }
 
-  // Check environment
-  const kvVars = ['KV_URL', 'KV_REST_API_URL', 'KV_REST_API_TOKEN', 'KV_REST_API_READ_ONLY_TOKEN']
-  kvVars.forEach((v) => {
-    info.env = { ...(info.env as Record<string, unknown>), [v]: process.env[v] ? 'SET ✅' : 'MISSING ❌' }
+  // Check all possible env vars
+  const allVars = [
+    'KV_URL', 'KV_REST_API_URL', 'KV_REST_API_TOKEN', 'KV_REST_API_READ_ONLY_TOKEN',
+    'UPSTASH_REDIS_REST_URL', 'UPSTASH_REDIS_REST_TOKEN',
+    'REDIS_URL', 'REDIS_TOKEN',
+  ]
+  allVars.forEach((v) => {
+    const val = process.env[v]
+    if (val) {
+      info.env = { ...(info.env as Record<string, unknown>), [v]: `SET ✅ (${val.slice(0, 30)}...)` }
+    }
   })
 
-  // Test KV connection
+  // Test Redis connection via @upstash/redis
   try {
-    const { kv } = await import('@vercel/kv')
-    await kv.set('debug:test', { ts: Date.now(), msg: 'hello' })
-    const val = await kv.get('debug:test')
+    const { Redis } = await import('@upstash/redis')
+    const redis = Redis.fromEnv()
+    await redis.set('debug:test', JSON.stringify({ ts: Date.now(), msg: 'hello' }))
+    const val = await redis.get('debug:test')
     if (val) {
-      info.kv = { status: 'working ✅', error: null, testValue: val }
+      info.redis = { status: 'working ✅', error: null, testValue: val }
     } else {
-      info.kv = { status: 'write OK but read returned null ⚠️', error: null }
+      info.redis = { status: 'write OK but read returned null ⚠️', error: null }
     }
-    await kv.del('debug:test')
+    await redis.del('debug:test')
   } catch (err) {
-    info.kv = {
+    info.redis = {
       status: 'error ❌',
       error: err instanceof Error ? `${err.name}: ${err.message}` : String(err),
     }

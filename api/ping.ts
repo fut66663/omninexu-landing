@@ -1,11 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { kv } from '@vercel/kv'
+import { Redis } from '@upstash/redis'
 
-// ============================================================
-// Ping endpoint — lightweight homepage visit tracking
-// Triggered by <link rel="alternate"> in index.html <head>
-// AI agents that follow link tags will hit this.
-// ============================================================
+const redis = Redis.fromEnv()
 
 function identifyAgent(ua: string | undefined): string {
   if (!ua || ua.trim() === '') return 'empty'
@@ -42,18 +38,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     console.log(`[ping] ${JSON.stringify(visit)}`)
 
-    // Persist to KV (graceful fallback)
     try {
       const today = visit.iso.slice(0, 10)
       await Promise.all([
-        kv.set(`visit:home-${src}:${ts}`, visit, { ex: 2592000 }),
-        kv.incr('count:total'),
-        kv.incr(`count:today:${today}`),
-        kv.incr(`count:agent:${agent}`),
-        kv.incr('count:path:/ (homepage)'),
+        redis.set(`visit:home:${ts}`, visit, { ex: 2592000 }),
+        redis.incr('count:total'),
+        redis.incr(`count:today:${today}`),
+        redis.incr(`count:agent:${agent}`),
+        redis.incr('count:path:/ (homepage)'),
       ])
     } catch (_err) {
-      // KV not available — console.log already captured it
+      // Redis not available
     }
 
     return res.status(204).send('')

@@ -1,9 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { kv } from '@vercel/kv'
+import { Redis } from '@upstash/redis'
 
-// ============================================================
-// Stats dashboard — HTML page showing visit metrics
-// ============================================================
+const redis = Redis.fromEnv()
 
 const AGENT_LABELS: Record<string, string> = {
   openai: 'OpenAI (GPTBot/ChatGPT)',
@@ -19,14 +17,8 @@ const AGENT_LABELS: Record<string, string> = {
 
 const COLORS = ['#10b981', '#8b5cf6', '#f59e0b', '#06b6d4', '#ec4899', '#3b82f6', '#6b7280', '#94a3b8']
 
-function bar(percent: number): string {
-  const w = Math.round(percent * 2) // 0-100 → 0-200 chars
-  return '█'.repeat(Math.min(w, 30))
-}
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
-    // --- Gather metrics from KV ---
     const today = new Date().toISOString().slice(0, 10)
 
     let total = 0
@@ -34,6 +26,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const agentCounts: Record<string, number> = {}
     const pathCounts: Record<string, number> = {}
     let recentVisits: Array<Record<string, unknown>> = []
+    let redisOk = false
 
     try {
       const keys = [
@@ -44,50 +37,40 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         'count:path:/catalog.json',
       ]
 
-      const vals = await Promise.all(keys.map((k) => kv.get<number>(k)))
+      const vals = await Promise.all(keys.map((k) => redis.get<number>(k)))
       total = vals[0] || 0
       todayCount = vals[1] || 0
+      redisOk = true
 
       Object.keys(AGENT_LABELS).forEach((a, i) => {
         agentCounts[a] = vals[2 + i] || 0
       })
-
       pathCounts['/llms.txt'] = vals[2 + Object.keys(AGENT_LABELS).length] || 0
       pathCounts['/catalog.json'] = vals[2 + Object.keys(AGENT_LABELS).length + 1] || 0
 
-      // Fetch recent visits
-      const visitKeys = await kv.keys('visit:*')
+      // Recent visits
+      const visitKeys = await redis.keys('visit:*')
       if (visitKeys.length > 0) {
         const sorted = visitKeys.sort().reverse().slice(0, 20)
-        const rows = await Promise.all(sorted.map((k) => kv.get<Record<string, unknown>>(k)))
+        const rows = await Promise.all(sorted.map((k) => redis.get<Record<string, unknown>>(k)))
         recentVisits = rows.filter(Boolean) as Array<Record<string, unknown>>
       }
     } catch (_err) {
-      // KV not available — show zeroed dashboard
+      // Redis not available
     }
 
-    // --- Build agent distribution rows ---
     const agentRows = Object.entries(AGENT_LABELS)
       .map(([key, label], i) => {
         const count = agentCounts[key] || 0
-        const pct = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0'
-        return { key, label, count, pct: parseFloat(pct), color: COLORS[i] }
+        const pct = total > 0 ? parseFloat(((count / total) * 100).toFixed(1)) : 0
+        return { key, label, count, pct, color: COLORS[i] }
       })
-      .filter((r) => r.count > 0) // only show agents that have visited
       .sort((a, b) => b.count - a.count)
-
-    if (agentRows.length === 0) {
-      // Show all rows with zeros on empty dashboard
-      Object.entries(AGENT_LABELS).forEach(([key, label], i) => {
-        agentRows.push({ key, label, count: 0, pct: 0, color: COLORS[i] })
-      })
-    }
 
     const llmsCount = pathCounts['/llms.txt'] || 0
     const catalogCount = pathCounts['/catalog.json'] || 0
     const pathTotal = llmsCount + catalogCount || 1
 
-    // --- Render HTML ---
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -105,10 +88,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
   .sub { color: #64748b; font-size: 13px; margin-bottom: 24px; }
   .kpis { display: flex; gap: 12px; margin-bottom: 28px; }
-  .kpi {
-    flex: 1; background: #1e293b; border-radius: 10px;
-    padding: 16px; text-align: center;
-  }
+  .kpi { flex: 1; background: #1e293b; border-radius: 10px; padding: 16px; text-align: center; }
   .kpi .num { font-size: 32px; font-weight: 700; color: #38bdf8; }
   .kpi .lbl { font-size: 12px; color: #64748b; margin-top: 4px; }
   h2 { font-size: 15px; font-weight: 600; margin: 24px 0 12px; color: #94a3b8; }
@@ -127,13 +107,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   .tag { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 11px; }
   .empty { text-align: center; padding: 40px; color: #64748b; }
   .kv-warn { background: #422006; color: #fbbf24; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; }
+  .kv-ok { background: #052e16; color: #4ade80; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; }
   .refresh { color: #38bdf8; font-size: 12px; text-decoration: none; float: right; margin-top: -20px; }
 </style>
 </head>
 <body>
 <h1>🤖 AI Agent 访问统计</h1>
 <p class="sub">omninexu.com — 自动记录 AI 代理对 llms.txt / catalog.json 的访问</p>
-${total === 0 && recentVisits.length === 0 ? '<div class="kv-warn">📡 KV 存储未配置或无数据。Vercel 仪表盘 → Storage → KV → 创建 <code>omninexu-visits</code> 关联此项目。</div>' : ''}
+${redisOk ? '<div class="kv-ok">📡 Redis 已连接 — 数据实时更新</div>' : '<div class="kv-warn">📡 Redis 未连接。Vercel Marketplace → 安装 Upstash Redis → 关联此项目。</div>'}
 
 <div class="kpis">
   <div class="kpi"><div class="num">${total.toLocaleString()}</div><div class="lbl">总访问量</div></div>
@@ -177,10 +158,7 @@ ${recentVisits.length === 0
 </div>`).join('')}
 </div>
 
-<script>
-  // Auto-refresh every 60s
-  setTimeout(() => location.reload(), 60000)
-</script>
+<script>setTimeout(() => location.reload(), 60000)</script>
 </body>
 </html>`
 

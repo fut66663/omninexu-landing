@@ -1,5 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { kv } from '@vercel/kv'
+import { Redis } from '@upstash/redis'
+
+// ============================================================
+// Shared Redis client — auto-configures from env vars
+// ============================================================
+
+const redis = Redis.fromEnv()
 
 // ============================================================
 // Static file contents — inlined for reliable serving
@@ -168,25 +174,12 @@ const CATALOG_JSON = `{
 function identifyAgent(ua: string | undefined): string {
   if (!ua || ua.trim() === '') return 'empty'
 
-  // OpenAI family
   if (/GPTBot|ChatGPT|OAI-SearchBot/i.test(ua)) return 'openai'
-
-  // Anthropic family
   if (/Claude|anthropic|claude-web/i.test(ua)) return 'anthropic'
-
-  // Google family
   if (/Gemini|Googlebot|GoogleOther/i.test(ua)) return 'google'
-
-  // Perplexity
   if (/Perplexity|PerplexityBot/i.test(ua)) return 'perplexity'
-
-  // Agentic market / x402 payment agents (paying customers!)
   if (/x402|agentic|agentic-market/i.test(ua)) return 'agentic-market'
-
-  // Meta / Llama
   if (/Meta|Llama|facebookexternalhit/i.test(ua)) return 'meta'
-
-  // Other known search crawlers
   if (/Bytespider|Baiduspider|YandexBot|DuckDuckBot|Slurp/i.test(ua)) return 'search-bot'
 
   return 'unknown'
@@ -197,7 +190,6 @@ function identifyAgent(ua: string | undefined): string {
 // ============================================================
 
 function detectPath(req: VercelRequest): string {
-  // Vercel rewrite preserves original URL in headers
   const originalUrl = (req.headers['x-original-url'] as string) || req.url || '/'
   if (originalUrl.includes('catalog.json')) return '/catalog.json'
   if (originalUrl.includes('llms.txt')) return '/llms.txt'
@@ -205,7 +197,7 @@ function detectPath(req: VercelRequest): string {
 }
 
 // ============================================================
-// Logging — KV with console.log fallback
+// Logging — Upstash Redis with console fallback
 // ============================================================
 
 interface VisitLog {
@@ -218,26 +210,21 @@ interface VisitLog {
 }
 
 async function logVisit(v: VisitLog): Promise<void> {
-  // Always log to console (visible in Vercel Runtime Logs)
   console.log(`[track] ${JSON.stringify(v)}`)
 
-  // Persist to Vercel KV (gracefully falls back if KV not configured)
   try {
-    const today = v.iso.slice(0, 10) // YYYY-MM-DD
+    const today = v.iso.slice(0, 10)
     const visitKey = `visit:${v.path.replace(/\//g, '')}:${v.ts}`
 
     await Promise.all([
-      // Store individual visit record (30-day TTL)
-      kv.set(visitKey, v, { ex: 2592000 }),
-      // Increment counters (no TTL — permanent until explicitly reset)
-      kv.incr('count:total'),
-      kv.incr(`count:today:${today}`),
-      kv.incr(`count:agent:${v.agent}`),
-      kv.incr(`count:path:${v.path}`),
+      redis.set(visitKey, v, { ex: 2592000 }),
+      redis.incr('count:total'),
+      redis.incr(`count:today:${today}`),
+      redis.incr(`count:agent:${v.agent}`),
+      redis.incr(`count:path:${v.path}`),
     ])
   } catch (err) {
-    // KV not configured or write failed — no problem, console.log has us covered
-    console.warn('[track] KV write skipped (KV may not be configured)')
+    console.warn('[track] Redis write skipped (may not be configured yet)')
   }
 }
 
@@ -247,7 +234,6 @@ async function logVisit(v: VisitLog): Promise<void> {
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
-    // --- Extract request info ---
     const ua = req.headers['user-agent'] as string | undefined
     const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim()
       || req.socket.remoteAddress
@@ -256,33 +242,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const referer = (req.headers['referer'] as string) || ''
     const ts = Date.now()
 
-    // --- Identify agent ---
     const agent = identifyAgent(ua)
 
-    // --- Log visit ---
     await logVisit({
       agent,
-      ip: ip.replace(/[0-9]+\.[0-9]+\.[0-9]+\.([0-9]+)$/, 'x.x.x.$1'), // mask last octet for privacy
+      ip: ip.replace(/[0-9]+\.[0-9]+\.[0-9]+\.([0-9]+)$/, 'x.x.x.$1'),
       path,
       referer: referer || undefined,
       ts,
       iso: new Date(ts).toISOString(),
     })
 
-    // --- Serve the right file ---
     if (path === '/catalog.json') {
       res.setHeader('Content-Type', 'application/json')
       res.setHeader('Cache-Control', 'public, max-age=3600')
       return res.status(200).send(CATALOG_JSON)
     }
 
-    // Default: llms.txt
     res.setHeader('Content-Type', 'text/markdown; charset=utf-8')
     res.setHeader('Cache-Control', 'public, max-age=3600')
     return res.status(200).send(LLMS_TXT)
   } catch (err) {
     console.error('[track] error:', err)
-    // Even on error, try to serve llms.txt as fallback
     res.setHeader('Content-Type', 'text/markdown; charset=utf-8')
     return res.status(200).send(LLMS_TXT)
   }
