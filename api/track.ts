@@ -6,6 +6,7 @@ import { kv } from '@vercel/kv'
 // ============================================================
 
 const LLMS_TXT = `# OmniNexu — Agent Data Intelligence
+# Visit logged for analytics (anonymous, see /api/stats)
 
 > Machine-readable catalog. Agents: read this first.
 > Humans: https://omninexu.com
