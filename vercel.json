@@ -1,7 +1,0 @@
-{
-  "routes": [
-    { "src": "/llms.txt", "dest": "/api/track" },
-    { "src": "/catalog.json", "dest": "/api/track" },
-    { "handle": "filesystem" }
-  ]
-}
