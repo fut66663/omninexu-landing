@@ -133,18 +133,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 </style>
 </head>
 <body>
-<h1>🤖 AI Agent 访问统计</h1>
-<p class="sub">omninexu.com — 自动记录 AI 代理对 llms.txt / catalog.json 的访问</p>
-${redisOk ? '<div class="kv-ok">📡 Redis 已连接 — 数据实时更新</div>' : '<div class="kv-warn">📡 Redis 未连接。Vercel Marketplace → 安装 Upstash Redis → 关联此项目。</div>'}
+<h1>🤖 AI Agent Visit Stats</h1>
+<p class="sub">omninexu.com — automatically tracking AI agent visits to llms.txt and discovery files</p>
+${redisOk ? '<div class="kv-ok">📡 Redis Connected — Live data</div>' : '<div class="kv-warn">📡 Redis Not Connected. Install Upstash Redis via Vercel Marketplace and link to this project.</div>'}
 
 <div class="kpis">
-  <div class="kpi"><div class="num">${total.toLocaleString()}</div><div class="lbl">总访问量</div></div>
-  <div class="kpi"><div class="num">${todayCount.toLocaleString()}</div><div class="lbl">今日</div></div>
-  <div class="kpi"><div class="num">${uniqueSessions.toLocaleString()}</div><div class="lbl">独立会话</div></div>
-  <div class="kpi"><div class="num">${Object.values(agentCounts).filter(Boolean).length}</div><div class="lbl">Agent 类型</div></div>
+  <div class="kpi"><div class="num">${total.toLocaleString()}</div><div class="lbl">Total Visits</div></div>
+  <div class="kpi"><div class="num">${todayCount.toLocaleString()}</div><div class="lbl">Today</div></div>
+  <div class="kpi"><div class="num">${uniqueSessions.toLocaleString()}</div><div class="lbl">Unique Sessions</div></div>
+  <div class="kpi"><div class="num">${Object.values(agentCounts).filter(Boolean).length}</div><div class="lbl">Agent Types</div></div>
 </div>
 
-<h2>Agent 分布 <a class="refresh" href="?refresh=${Date.now()}">刷新</a></h2>
+<h2>Agent Distribution <a class="refresh" href="?refresh=${Date.now()}">Refresh</a></h2>
 ${agentRows.map(r => `
 <div class="row">
   <span class="name">${r.label}</span>
@@ -153,7 +153,7 @@ ${agentRows.map(r => `
   <span class="pct">${r.pct}%</span>
 </div>`).join('')}
 
-<h2>路径分布</h2>
+<h2>Path Distribution</h2>
 <div class="row">
   <span class="name">/llms.txt</span>
   <span class="bar-wrap"><span class="bar-fill" style="width:${Math.max((llmsCount / pathTotal) * 100, 2)}%;background:#38bdf8"></span></span>
@@ -173,9 +173,9 @@ ${agentRows.map(r => `
   <span class="pct">${pathTotal > 0 ? (((pathCounts['/ (homepage)'] || 0) / pathTotal) * 100).toFixed(1) : '0.0'}%</span>
 </div>
 
-<h2>国家/地区分布</h2>
+<h2>Country Distribution</h2>
 ${(() => {
-  const countryLabels: Record<string, string> = { US:'🇺🇸 美国', CN:'🇨🇳 中国', JP:'🇯🇵 日本', GB:'🇬🇧 英国', DE:'🇩🇪 德国', SG:'🇸🇬 新加坡', HK:'🇭🇰 香港', KR:'🇰🇷 韩国', IN:'🇮🇳 印度', CA:'🇨🇦 加拿大', Other:'🌍 其他', XX:'🌍 未知' }
+  const countryLabels: Record<string, string> = { US:'🇺🇸 United States', CN:'🇨🇳 China', JP:'🇯🇵 Japan', GB:'🇬🇧 United Kingdom', DE:'🇩🇪 Germany', SG:'🇸🇬 Singapore', HK:'🇭🇰 Hong Kong', KR:'🇰🇷 South Korea', IN:'🇮🇳 India', CA:'🇨🇦 Canada', Other:'🌍 Other', XX:'🌍 Unknown' }
   const entries = Object.entries(countryCounts).filter(([,c]) => c > 0)
   if (entries.length === 0) entries.push(['—', 0])
   const countryMax = Math.max(...entries.map(([,c]) => c), 1)
@@ -188,10 +188,10 @@ ${(() => {
 </div>`).join('')
 })()}
 
-<h2>最近访问</h2>
+<h2>Recent Visits</h2>
 <div class="recent">
 ${recentVisits.length === 0
-    ? '<div class="empty">暂无访问记录。部署后 AI 代理访问 /llms.txt 或 /catalog.json 时会出现在这里。</div>'
+    ? '<div class="empty">No visits yet. AI agent visits to /llms.txt or discovery files will appear here after deployment.</div>'
     : recentVisits.map((v) => `
 <div class="r-row">
   <span class="r-time">${(v.iso as string)?.replace('T', ' ').slice(0, 19) || ''}</span>
