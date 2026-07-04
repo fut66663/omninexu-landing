@@ -40,6 +40,40 @@ Response structure:
 2. SimFin: Standardized financial statements, ~4,700 US companies, FY2020–present
 3. Cross-validation: SimFin vs EDGAR discrepancy detection (>2% warning, >10% critical)
 
+## Pricing
+
+| Tier | Price | Dimensions |
+|------|-------|------------|
+| **Quick** | $0.02 USDC | fundamentals + confidence + company info + peer comparison |
+| Standard | 🔜 Coming soon | + insider + institutional |
+| Pro | 🔜 Coming soon | + longitudinal CAGR (full 6-dimensional intelligence) |
+
+Payment via **x402 protocol** on Base mainnet. No API key, no signup.
+Buyer pays **zero gas** — CDP Facilitator sponsors all on-chain fees.
+
+## Payment Flow
+
+```
+1. Agent requests data
+   → HTTP 402 + PAYMENT-REQUIRED header (amount, network, payTo)
+
+2. Agent signs with x402 SDK
+   → EIP-3009 off-chain signature (no gas, no native token needed)
+
+3. Agent retries with payment proof
+   → CDP Facilitator verifies → settles USDC on Base → 200 + data
+```
+
+$0.02 USDC per query. Wallet-to-wallet, instant settlement.
+
+## Coverage
+
+- 500 S&P 500 companies (NYSE, NASDAQ, AMEX)
+- 440 tickers with full fundamentals (88% coverage, expanding)
+- 16,746 standardized financial facts
+- Sources: SEC EDGAR + SimFin, cross-validated
+- Daily updates
+
 ## API
 
 Base URL: `https://api.omninexu.com`
