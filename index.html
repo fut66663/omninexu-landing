@@ -112,7 +112,12 @@
 
   @keyframes pulseRing { 0% { box-shadow: 0 0 0 0 rgba(74,222,128,0.4); } 70% { box-shadow: 0 0 0 12px rgba(74,222,128,0); } 100% { box-shadow: 0 0 0 0 rgba(74,222,128,0); } }
   .pulse-ring { animation: pulseRing 2.5s ease-out infinite; }
+  .drop-shadow-glow { filter: drop-shadow(0 0 20px rgba(74,222,128,0.3)); }
 </style>
+<link rel="icon" type="image/png" href="/icon.png">
+<link rel="apple-touch-icon" href="/icon.png">
+<meta property="og:image" content="https://omninexu.com/icon.png">
+<meta name="twitter:image" content="https://omninexu.com/icon.png">
 </head>
 <body class="antialiased">
 
@@ -130,6 +135,8 @@
       <span class="w-2 h-2 bg-neon rounded-full"></span>
       S&P 500 Company Intelligence · v1
     </div>
+
+    <img src="/icon.png" alt="OmniNexu" class="w-24 h-24 md:w-32 md:h-32 mx-auto mb-6 drop-shadow-glow">
 
     <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-6">
       <span class="text-white">omni</span><span class="text-glow">nexu</span>
@@ -174,83 +181,44 @@
   <div class="max-w-6xl mx-auto">
 
     <div class="reveal mb-16">
-      <h2 class="text-3xl md:text-4xl font-bold text-white mb-3">Company Context API</h2>
-      <p class="text-gray-500 font-mono text-sm">GET /v1/company/context?ticker=AAPL → 4-layer structured response</p>
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-3">7 API Endpoints</h2>
+      <p class="text-gray-500 font-mono text-sm">Three pricing tiers — all SEC EDGAR-sourced. Available on <a href="https://agentic.market/services/api-omninexu-com" class="text-neon/80 hover:text-neon underline">agentic.market</a>.</p>
     </div>
 
-    <div class="reveal glass p-8 mb-8 border-glow">
-      <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
-        <div>
-          <div class="flex items-center gap-3 mb-2">
-            <span class="inline-block px-2 py-0.5 text-[10px] font-mono font-bold text-neon border border-neon/30 rounded">GET</span>
-            <code class="text-lg text-white font-mono">/v1/company/context?ticker=AAPL</code>
-          </div>
-          <p class="text-gray-400 text-sm">4 data layers per ticker: fundamentals, insider trades, institutional holdings, peer comparison.</p>
-        </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div class="reveal glass p-5 border border-white/5">
+        <div class="text-xs font-mono text-neon/60 mb-2">Quick · $0.01–0.02</div>
+        <div class="text-white text-sm font-medium mb-1">Company Context</div>
+        <div class="text-gray-500 text-xs mb-2">Fundamentals + peers + confidence</div>
+        <div class="text-xs font-mono text-gray-600">/v1/company/context</div>
+        <div class="text-xs font-mono text-gray-600 mt-1">/v1/company/filings</div>
+        <div class="text-xs font-mono text-gray-600">/v1/company/peer-ranking</div>
       </div>
-
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-        <div class="bg-black/30 rounded-lg p-3 border border-white/5">
-          <div class="text-neon text-xs font-mono mb-1">01</div>
-          <div class="text-white text-sm font-medium">Fundamentals</div>
-          <div class="text-gray-600 text-xs">9 metrics from 10-K/Q</div>
-        </div>
-        <div class="bg-black/30 rounded-lg p-3 border border-white/5">
-          <div class="text-neon text-xs font-mono mb-1">02</div>
-          <div class="text-white text-sm font-medium">Insider Trading</div>
-          <div class="text-gray-600 text-xs">SEC Form 4 transactions</div>
-        </div>
-        <div class="bg-black/30 rounded-lg p-3 border border-white/5">
-          <div class="text-neon text-xs font-mono mb-1">03</div>
-          <div class="text-white text-sm font-medium">Institutional</div>
-          <div class="text-gray-600 text-xs">13F top holders</div>
-        </div>
-        <div class="bg-black/30 rounded-lg p-3 border border-white/5">
-          <div class="text-neon text-xs font-mono mb-1">04</div>
-          <div class="text-white text-sm font-medium">Peer Comparison</div>
-          <div class="text-gray-600 text-xs">Revenue & income ranking</div>
-        </div>
+      <div class="reveal glass p-5 border border-white/5">
+        <div class="text-xs font-mono text-neon/60 mb-2">Standard · $0.03</div>
+        <div class="text-white text-sm font-medium mb-1">Insider & Institutional</div>
+        <div class="text-gray-500 text-xs mb-2">Form 4 trades + 13F holdings</div>
+        <div class="text-xs font-mono text-gray-600">/v1/company/insider</div>
+        <div class="text-xs font-mono text-gray-600 mt-1">/v1/company/institutional</div>
       </div>
-
-      <div class="flex flex-wrap gap-4 text-xs font-mono text-gray-500">
-        <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-neon/50 rounded-full"></span> Revenue / Net Income / EPS / Gross Profit</span>
-        <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-neon/50 rounded-full"></span> Assets / Liabilities / Equity / Cash Flow</span>
-        <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-neon/50 rounded-full"></span> CAGR + Percentile Rank</span>
+      <div class="reveal glass p-5 border border-neon/20">
+        <div class="text-xs font-mono text-neon/60 mb-2">Premium · $0.05</div>
+        <div class="text-white text-sm font-medium mb-1">Smart Money + Growth</div>
+        <div class="text-gray-500 text-xs mb-2">Bundle + multi-year CAGR</div>
+        <div class="text-xs font-mono text-gray-600">/v1/company/smart-money</div>
+        <div class="text-xs font-mono text-gray-600 mt-1">/v1/company/longitudinal</div>
       </div>
     </div>
 
-    <!-- Sample Response -->
-    <div class="reveal">
-      <div class="flex items-center gap-2 mb-3 text-xs font-mono text-gray-600">
-        <span>Sample response — AAPL</span>
-        <span class="text-neon cursor">JSON</span>
-      </div>
-      <div class="code-block p-6 overflow-x-auto text-xs md:text-sm">
-        <pre class="text-gray-300">{
-  <span class="text-neon">"ticker"</span>: <span class="text-white">"AAPL"</span>,
-  <span class="text-neon">"name"</span>: <span class="text-white">"Apple Inc."</span>,
-  <span class="text-neon">"fundamentals"</span>: {
-    <span class="text-gray-500">"revenue"</span>: { <span class="text-gray-500">"value"</span>: <span class="text-white">416161000000</span>, <span class="text-gray-500">"unit"</span>: <span class="text-white">"USD"</span> },
-    <span class="text-gray-500">"net_income"</span>: { <span class="text-gray-500">"value"</span>: <span class="text-white">112010000000</span> },
-    <span class="text-gray-500">"eps_diluted"</span>: { <span class="text-gray-500">"value"</span>: <span class="text-white">7.46</span> }
-  },
-  <span class="text-neon">"insider"</span>: {
-    <span class="text-gray-500">"recent_transactions"</span>: [
-      { <span class="text-gray-500">"insider_name"</span>: <span class="text-white">"Arthur Levinson"</span>, <span class="text-gray-500">"type"</span>: <span class="text-amber-400">"S"</span>, <span class="text-gray-500">"shares"</span>: <span class="text-white">50000</span>, <span class="text-gray-500">"price"</span>: <span class="text-white">311.02</span> }
-    ]
-  },
-  <span class="text-neon">"institutional"</span>: {
-    <span class="text-gray-500">"top_holders"</span>: [
-      { <span class="text-gray-500">"name"</span>: <span class="text-white">"Vanguard Group"</span>, <span class="text-gray-500">"value"</span>: <span class="text-white">387749544852</span> }
-    ]
-  },
-  <span class="text-neon">"confidence"</span>: <span class="text-neon font-bold">"high"</span>
-}</pre>
-      </div>
+    <div class="reveal flex flex-wrap gap-3 justify-center">
+      <a href="https://agentic.market/services/api-omninexu-com" class="inline-flex items-center gap-2 bg-neon text-black font-semibold px-6 py-3 rounded-xl hover:bg-neon-dim transition-colors duration-300 text-sm">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Access on agentic.market
+      </a>
+      <a href="/llms.txt" class="inline-flex items-center gap-2 border border-white/10 text-white px-6 py-3 rounded-xl hover:border-neon/40 transition-all duration-300 text-sm">
+        AI Agent: Read llms.txt →
+      </a>
     </div>
-
-  </div>
-</section>
 
 <hr class="section-divider">
 

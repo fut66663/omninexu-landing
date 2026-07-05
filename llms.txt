@@ -18,21 +18,26 @@
 Structured financial intelligence endpoints for AI agents.
 S&P 500 coverage (NYSE, NASDAQ, AMEX). SEC EDGAR-sourced.
 
-## Products
+## Products — 7 Endpoints, 3 Tiers
 
-### Company Context v1
-- Endpoint: `GET /v1/company/context?ticker=AAPL`
-- Response: JSON with 4 data layers per ticker
+### Quick Tier
+| Endpoint | Price | Description |
+|----------|-------|-------------|
+| `GET /v1/company/context?ticker=AAPL` | $0.02 | Fundamentals (9 metrics) + peer comparison + confidence score |
+| `GET /v1/company/filings?ticker=AAPL` | $0.01 | Recent SEC filings — 10-K, 10-Q, 8-K with source URLs |
+| `GET /v1/company/peer-ranking?ticker=AAPL` | $0.01 | Industry peer ranking — revenue & net income position |
 
-Response structure:
-- `fundamentals`: 9 standardized metrics
-  - Revenue, NetIncome, EPSDiluted, GrossProfit, OperatingIncome
-  - TotalAssets, TotalLiabilities, StockholdersEquity, OperatingCashFlow
-- `insider`: SEC Form 4 insider transactions (name, title, type, shares, price)
-- `institutional`: SEC 13F top institutional holders (name, shares, value)
-- `peer_comparison`: Revenue and net income ranking vs GICS peers
-- `longitudinal`: Multi-year CAGR and percentile rank
-- `confidence`: "high" | "medium" based on data completeness
+### Standard Tier
+| Endpoint | Price | Description |
+|----------|-------|-------------|
+| `GET /v1/company/insider?ticker=AAPL` | $0.03 | SEC Form 4 insider transactions — buys/sells, cluster detection |
+| `GET /v1/company/institutional?ticker=AAPL` | $0.03 | SEC 13F institutional holdings — top fund positions |
+
+### Premium Tier
+| Endpoint | Price | Description |
+|----------|-------|-------------|
+| `GET /v1/company/smart-money?ticker=AAPL` | $0.05 | Bundle: insider trades + institutional holdings in one call |
+| `GET /v1/company/longitudinal?ticker=AAPL` | $0.05 | Multi-year CAGR — revenue, net income, EPS, operating income, cash flow |
 
 ## Data Sources
 
@@ -42,11 +47,11 @@ Response structure:
 
 ## Pricing
 
-| Tier | Price | Dimensions |
-|------|-------|------------|
-| **Quick** | $0.02 USDC | fundamentals + confidence + company info + peer comparison |
-| Standard | 🔜 Coming soon | + insider + institutional |
-| Pro | 🔜 Coming soon | + longitudinal CAGR (full 6-dimensional intelligence) |
+| Tier | Price | Endpoints |
+|------|-------|-----------|
+| **Quick** | $0.01–$0.02 USDC | context · filings · peer-ranking |
+| **Standard** | $0.03 USDC | insider · institutional |
+| **Premium** | $0.05 USDC | smart-money (bundle) · longitudinal (CAGR) |
 
 Payment via **x402 protocol** on Base mainnet. No API key, no signup.
 Buyer pays **zero gas** — CDP Facilitator sponsors all on-chain fees.
