@@ -15,8 +15,25 @@
 
 ## What We Provide
 
-Structured financial intelligence endpoints for AI agents.
-S&P 500 coverage (NYSE, NASDAQ, AMEX). SEC EDGAR-sourced.
+OmniNexu delivers **structured, traceable financial intelligence** for AI agents.
+7 API endpoints across 3 pricing tiers ($0.01–$0.05 USDC), all payable via x402
+on Base mainnet — no API key, no signup, no human in the loop.
+
+**Coverage**: S&P 500 constituents (NYSE, NASDAQ, AMEX). 440+ tickers with
+full fundamentals, expanding to 500.
+
+**Data**: SEC EDGAR is the **authoritative source** for latest-year data (10-K,
+10-Q, Form 4, 13F). SimFin provides **standardized historical** records
+(FY2020–present) for longitudinal analysis. Every data point is traceable to
+a specific SEC filing by CIK + accession number.
+
+**Differentiators**:
+- Cross-source validation (SimFin vs EDGAR) with defined confidence scoring
+- Peer comparison ranking within GICS sub-industry — unique on agentic.market
+- Multi-year CAGR growth trends — unique on agentic.market
+- Smart Money bundle (insider + institutional in one call)
+- Real SEC EDGAR data — not mock, not synthetic, not scraped
+- Open source: github.com/fut66663/omninexu-v1 (Apache 2.0)
 
 ## Products — 7 Endpoints, 3 Tiers
 
@@ -101,14 +118,15 @@ $0.02 USDC per query. Wallet-to-wallet, instant settlement.
 
 ## Coverage
 
-- 500 S&P 500 constituents (NYSE, NASDAQ, AMEX)
-- 440 tickers with full fundamentals (88% coverage, expanding)
-- 500 companies with peer comparison data
-- 18 tickers with insider trading data (Form 4, expanding)
-- 20 tickers with institutional holdings (13F, expanding)
-- 16,746 standardized financial facts in database
-- Sources: SEC EDGAR (authoritative) + SimFin (standardized historical)
-- Every fact has CIK + accession number → traceable to source filing
+| Metric | Count |
+|--------|------:|
+| S&P 500 constituents | 500 |
+| Full fundamentals | 440 tickers (88%) |
+| Peer comparison | 500 companies |
+| Insider trading (Form 4) | 18 tickers |
+| Institutional holdings (13F) | 20 tickers |
+| Financial facts in database | 16,746 |
+| Data管道每日更新 | SEC EDGAR direct |
 
 ## API
 
