@@ -39,11 +39,39 @@ S&P 500 coverage (NYSE, NASDAQ, AMEX). SEC EDGAR-sourced.
 | `GET /v1/company/smart-money?ticker=AAPL` | $0.05 | Bundle: insider trades + institutional holdings in one call |
 | `GET /v1/company/longitudinal?ticker=AAPL` | $0.05 | Multi-year CAGR — revenue, net income, EPS, operating income, cash flow |
 
-## Data Sources
+## Data Sources & Attribution
 
-1. SEC EDGAR: 10-K (annual), 10-Q (quarterly), Form 4 (insider), 13F (institutional)
-2. SimFin: Standardized financial statements, ~4,700 US companies, FY2020–present
-3. Cross-validation: SimFin vs EDGAR discrepancy detection (>2% warning, >10% critical)
+Every response includes a `sources` array with filing URLs. Each data point
+is traceable to a specific SEC filing by CIK + accession number.
+
+### Source Hierarchy
+
+| Data Dimension | Primary Source | Secondary | Update Cycle |
+|----------------|---------------|-----------|-------------|
+| Fundamentals (latest year) | SEC EDGAR 10-K | SimFin | Daily |
+| Fundamentals (historical 3Y+) | SimFin FY2020–present | SEC EDGAR XBRL | Weekly |
+| Insider Trading | SEC EDGAR Form 4 | — | Daily |
+| Institutional Holdings | SEC EDGAR 13F-HR | — | Quarterly |
+| Peer Comparison | SEC EDGAR + GICS | — | Daily |
+| Longitudinal CAGR | SimFin + SEC EDGAR | — | Weekly |
+
+### Cross-Validation
+
+SimFin vs EDGAR discrepancy detection on 9 core concepts:
+- Discrepancy < 2% → confidence: "high"
+- Discrepancy 2–10% → confidence: "medium" + warning flag
+- Discrepancy > 10% → confidence: "low" + critical flag
+- Either source missing → confidence: "medium"
+
+### Traceability (Roadmap)
+
+Each financial fact will include:
+- `source_filing`: 10-K, 10-Q, Form 4, or 13F-HR
+- `source_url`: Direct link to sec.gov filing
+- `cik`: Company CIK number
+- `accession`: SEC accession number
+- `fiscal_year` + `fiscal_period`: Reporting period
+- (Future) `page_number`: Specific page/section in the filing
 
 ## Pricing
 
@@ -73,11 +101,14 @@ $0.02 USDC per query. Wallet-to-wallet, instant settlement.
 
 ## Coverage
 
-- 500 S&P 500 companies (NYSE, NASDAQ, AMEX)
+- 500 S&P 500 constituents (NYSE, NASDAQ, AMEX)
 - 440 tickers with full fundamentals (88% coverage, expanding)
-- 16,746 standardized financial facts
-- Sources: SEC EDGAR + SimFin, cross-validated
-- Daily updates
+- 500 companies with peer comparison data
+- 18 tickers with insider trading data (Form 4, expanding)
+- 20 tickers with institutional holdings (13F, expanding)
+- 16,746 standardized financial facts in database
+- Sources: SEC EDGAR (authoritative) + SimFin (standardized historical)
+- Every fact has CIK + accession number → traceable to source filing
 
 ## API
 
