@@ -1,0 +1,32 @@
+{
+  "name": "OmniNexu",
+  "description": "AI Agent Decision Context Engine — structured, traceable financial intelligence for AI agents. SEC EDGAR-sourced fundamentals, insider trades, institutional holdings, peer ranking, and CAGR trends for US-listed stocks. Pay per query via x402 on Base mainnet.",
+  "version": "0.1.0",
+  "website": "https://www.omninexu.com",
+  "repository": "https://github.com/fut66663/omninexu-v1",
+  "api": {
+    "base_url": "https://api.omninexu.com",
+    "docs": "https://api.omninexu.com/docs",
+    "health": "https://api.omninexu.com/v1/health",
+    "discovery": "https://api.omninexu.com/.well-known/x402",
+    "dashboard": "https://api.omninexu.com/dashboard"
+  },
+  "payment": {
+    "protocol": "x402",
+    "network": "eip155:8453",
+    "currency": "USDC",
+    "facilitator": "CDP"
+  },
+  "endpoints": [
+    {"path": "/v1/company/context",       "method": "GET", "price": "$0.05", "description": "Fundamentals (9 metrics) + peer comparison + confidence score"},
+    {"path": "/v1/company/pulse",          "method": "GET", "price": "$0.02", "description": "Investment signals — insider, institutional, revenue trend"},
+    {"path": "/v1/company/filings",        "method": "GET", "price": "$0.01", "description": "Recent SEC filings — 10-K, 10-Q, 8-K with source URLs"},
+    {"path": "/v1/company/peer-ranking",   "method": "GET", "price": "$0.02", "description": "Industry peer ranking — revenue & net income position"},
+    {"path": "/v1/company/insider",        "method": "GET", "price": "$0.03", "description": "SEC Form 4 insider transactions — executive buys/sells"},
+    {"path": "/v1/company/institutional",  "method": "GET", "price": "$0.03", "description": "SEC 13F institutional holdings — top fund positions"},
+    {"path": "/v1/company/smart-money",    "method": "GET", "price": "$0.05", "description": "Bundle: insider trades + institutional holdings"},
+    {"path": "/v1/company/longitudinal",   "method": "GET", "price": "$0.03", "description": "Multi-year CAGR trends — revenue, net income, EPS, cash flow"}
+  ],
+  "tags": ["stocks", "finance", "us-equities", "sec-edgar", "financial-data"],
+  "contact": "omninexu@outlook.com"
+}

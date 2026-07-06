@@ -1,11 +1,9 @@
 {
   "name": "omninexu-landing",
   "private": true,
-  "description": "OmniNexu Agent Data Intelligence — Landing Page + AI Agent Tracking",
+  "description": "OmniNexu Agent Data Intelligence — Landing Page",
   "scripts": {},
-  "dependencies": {
-    "@upstash/redis": "^1.38.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@vercel/node": "^3.0.0"
   }
