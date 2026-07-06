@@ -1,6 +1,6 @@
 {
   "name": "OmniNexu",
-  "description": "AI Agent Decision Context Engine — structured, traceable financial intelligence for AI agents. SEC EDGAR-sourced fundamentals, insider trades, institutional holdings, peer ranking, and CAGR trends for US-listed stocks. Pay per query via x402 on Base mainnet.",
+  "description": "OmniNexu Financial Data delivers structured, traceable financial intelligence for AI agents. Company financial fundamentals with peer comparison and cross-source confidence scoring for US-listed stocks. Revenue, net income, EPS, assets, liabilities, cash flow from SEC EDGAR 10-K/10-Q filings. Includes industry peer ranking and data-quality confidence score. Real SEC EDGAR data, not mock. 8 endpoints across 3 pricing tiers, pay per query via x402 on Base mainnet — no API key, no signup.",
   "version": "0.1.0",
   "website": "https://www.omninexu.com",
   "repository": "https://github.com/fut66663/omninexu-v1",
@@ -18,14 +18,14 @@
     "facilitator": "CDP"
   },
   "endpoints": [
-    {"path": "/v1/company/context",       "method": "GET", "price": "$0.05", "description": "Fundamentals (9 metrics) + peer comparison + confidence score"},
-    {"path": "/v1/company/pulse",          "method": "GET", "price": "$0.02", "description": "Investment signals — insider, institutional, revenue trend"},
-    {"path": "/v1/company/filings",        "method": "GET", "price": "$0.01", "description": "Recent SEC filings — 10-K, 10-Q, 8-K with source URLs"},
-    {"path": "/v1/company/peer-ranking",   "method": "GET", "price": "$0.02", "description": "Industry peer ranking — revenue & net income position"},
-    {"path": "/v1/company/insider",        "method": "GET", "price": "$0.03", "description": "SEC Form 4 insider transactions — executive buys/sells"},
-    {"path": "/v1/company/institutional",  "method": "GET", "price": "$0.03", "description": "SEC 13F institutional holdings — top fund positions"},
-    {"path": "/v1/company/smart-money",    "method": "GET", "price": "$0.05", "description": "Bundle: insider trades + institutional holdings"},
-    {"path": "/v1/company/longitudinal",   "method": "GET", "price": "$0.03", "description": "Multi-year CAGR trends — revenue, net income, EPS, cash flow"}
+    {"path": "/v1/company/context",       "method": "GET", "price": "$0.05", "description": "Company financial fundamentals with peer comparison and cross-source confidence scoring for US-listed stocks. Revenue, net income, EPS, assets, liabilities, cash flow from SEC EDGAR 10-K/10-Q filings. Includes industry peer ranking and data-quality confidence score. Real SEC EDGAR data, not mock."},
+    {"path": "/v1/company/pulse",          "method": "GET", "price": "$0.02", "description": "Investment signals for any US-listed stock — insider sentiment, institutional flow, revenue trend, and recent insider transactions aggregated into a bullish/bearish rating. Real SEC EDGAR data, not mock."},
+    {"path": "/v1/company/filings",        "method": "GET", "price": "$0.01", "description": "SEC EDGAR filings for any US-listed company — 10-K annual reports, 10-Q quarterly reports, 8-K material events. Ticker lookup with direct sec.gov source URLs and filing dates. Real SEC EDGAR data, not mock."},
+    {"path": "/v1/company/peer-ranking",   "method": "GET", "price": "$0.02", "description": "Industry peer comparison and competitive ranking for US-listed stocks — see where a company ranks on revenue and net income within its GICS sub-industry. Competitive positioning in one call. Real SEC EDGAR data, not mock."},
+    {"path": "/v1/company/insider",        "method": "GET", "price": "$0.03", "description": "SEC Form 4 insider trading for any US-listed stock — executive buy/sell transactions with name, title, shares, price and date. Returns net shares traded and transaction count over the last 90 days. Real SEC EDGAR data, not mock."},
+    {"path": "/v1/company/institutional",  "method": "GET", "price": "$0.03", "description": "SEC 13F institutional holdings for any US-listed stock — top hedge fund and asset manager positions ranked by market value. Track whale accumulation, smart money moves, and fund portfolio changes. Real SEC EDGAR data, not mock."},
+    {"path": "/v1/company/smart-money",    "method": "GET", "price": "$0.05", "description": "Smart Money Bundle — SEC Form 4 insider trading + SEC 13F institutional holdings in one API call for any US stock. See what executives AND hedge funds are doing: insider buy/sell signals plus top fund positions. Real SEC EDGAR data, not mock."},
+    {"path": "/v1/company/longitudinal",   "method": "GET", "price": "$0.03", "description": "Multi-year CAGR growth trends for US-listed stocks — revenue, net income, EPS, operating income, and cash flow compound annual growth rates over 3-5 years. See long-term performance trajectory, not just the latest quarter. Real SEC EDGAR data, not mock."}
   ],
   "tags": ["stocks", "finance", "us-equities", "sec-edgar", "financial-data"],
   "contact": "omninexu@outlook.com"
